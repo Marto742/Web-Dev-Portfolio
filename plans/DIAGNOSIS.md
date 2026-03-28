@@ -74,8 +74,8 @@
 ### Low Priority
 - [x] **No dark/light mode toggle** — the design is locked to dark. Even a subtle toggle increases perceived polish.
 - [x] **`tsconfig.json` has loose settings** — `noUnusedLocals` and `noUnusedParameters` not enforced.
-- [ ] **No ESLint/Prettier config committed** — code style is inconsistent across files without a `.eslintrc` and `.prettierrc`.
-- [ ] **Vite 5.3.4 is outdated** — current stable is 6.x. Migration is mostly non-breaking.
+- [x] **No ESLint/Prettier config committed** — code style is inconsistent across files without a `.eslintrc` and `.prettierrc`.
+- [x] **Vite 5.3.4 is outdated** — N/A: migrated to Next.js, Vite no longer in stack.
 
 ---
 
