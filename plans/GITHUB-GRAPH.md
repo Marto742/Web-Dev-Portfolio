@@ -150,7 +150,7 @@ Immediate (this session)
 
 Advanced (future)
   [x] Hover tooltips per cell (date + count)
-  [ ] Streak counter badge
+  [x] Streak counter badge
   [ ] Live stats (totalContributions, repos, followers) replacing hardcoded numbers
   [ ] Responsive: 26 weeks on mobile
 

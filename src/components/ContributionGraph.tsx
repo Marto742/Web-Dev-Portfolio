@@ -37,6 +37,33 @@ function getColor(count: number): string {
   return 'bg-amber'
 }
 
+function calculateStreaks(weeks: ContributionWeek[]): { current: number; longest: number } {
+  const days = weeks.flatMap(w => w.contributionDays)
+
+  // Longest streak — single forward scan
+  let longest = 0
+  let run = 0
+  for (const day of days) {
+    if (day.contributionCount > 0) {
+      run++
+      if (run > longest) longest = run
+    } else {
+      run = 0
+    }
+  }
+
+  // Current streak — walk backwards, skip today if count is 0 (day not over yet)
+  let current = 0
+  let i = days.length - 1
+  if (i >= 0 && days[i].contributionCount === 0) i--
+  while (i >= 0 && days[i].contributionCount > 0) {
+    current++
+    i--
+  }
+
+  return { current, longest }
+}
+
 function getMonthLabels(weeks: ContributionWeek[]): Record<number, string> {
   const labels: Record<number, string> = {}
   let lastMonth = -1
@@ -137,15 +164,30 @@ export default function ContributionGraph() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-baseline justify-between mb-4">
+      <div className="flex items-center justify-between mb-4">
         <p className="font-mono text-[10px] tracking-[0.25em] uppercase text-ink-muted/60">
           Activity
         </p>
-        {data && (
-          <p className="font-mono text-[10px] text-ink-muted/40">
-            {data.totalContributions} contributions this year
-          </p>
-        )}
+        {data && (() => {
+          const streaks = calculateStreaks(data.weeks)
+          return (
+            <div className="flex items-center gap-3">
+              {streaks.current > 0 && (
+                <span className="font-mono text-[10px] text-amber border border-amber/30 px-2 py-0.5 rounded-sm">
+                  {streaks.current}d streak
+                </span>
+              )}
+              {streaks.longest > 0 && (
+                <span className="font-mono text-[10px] text-ink-muted/40">
+                  best {streaks.longest}d
+                </span>
+              )}
+              <span className="font-mono text-[10px] text-ink-muted/40">
+                {data.totalContributions} this year
+              </span>
+            </div>
+          )
+        })()}
       </div>
 
       {/* Graph or skeleton */}
