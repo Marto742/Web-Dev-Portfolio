@@ -85,7 +85,7 @@ function GraphSkeleton() {
     <div className="overflow-x-auto">
       <div className="flex gap-[3px] min-w-max">
         {Array.from({ length: 52 }, (_, i) => (
-          <div key={i} className="flex flex-col gap-[3px]">
+          <div key={i} className={i < 26 ? 'hidden md:flex flex-col gap-[3px]' : 'flex flex-col gap-[3px]'}>
             {Array.from({ length: 7 }, (_, j) => (
               <div key={j} className="w-3 h-3 rounded-sm bg-bg-card animate-pulse" />
             ))}
@@ -103,44 +103,53 @@ function GraphLoaded({ data }: { data: ContributionCalendar }) {
     stagger: 0.012,
     start: 'top 88%',
   })
+  const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null)
 
   const monthLabels = getMonthLabels(data.weeks)
+  const mobileOffset = Math.max(0, data.weeks.length - 26)
 
   return (
-    <div className="overflow-x-auto">
-      <div className="min-w-max">
-        {/* Month labels */}
-        <div className="flex gap-[3px] mb-1 ml-0">
-          {data.weeks.map((_, i) => (
-            <div key={i} className="w-3 flex items-end justify-start">
-              {monthLabels[i] ? (
-                <span className="font-mono text-[9px] text-ink-muted/50 whitespace-nowrap">
-                  {monthLabels[i]}
-                </span>
-              ) : null}
-            </div>
-          ))}
+    <div>
+      {/* Fixed tooltip — escapes overflow container, follows cursor */}
+      {tooltip && (
+        <div
+          className="fixed px-2 py-1 bg-bg-card border border-white/[0.08] rounded pointer-events-none z-50"
+          style={{ left: tooltip.x + 12, top: tooltip.y - 36 }}
+        >
+          <span className="font-mono text-[9px] text-ink-muted whitespace-nowrap">{tooltip.text}</span>
         </div>
+      )}
 
-        {/* Heatmap — stagger ref on this container, children = week columns */}
-        <div ref={graphRef} className="flex gap-[3px]">
-          {data.weeks.map((week, wi) => (
-            <div key={wi} className="flex flex-col gap-[3px]">
-              {week.contributionDays.map((day, di) => (
-                <div key={di} className="relative group">
+      <div className="overflow-x-auto">
+        <div className="min-w-max">
+          {/* Month labels */}
+          <div className="flex gap-[3px] mb-1 ml-0">
+            {data.weeks.map((_, i) => (
+              <div key={i} className={i < mobileOffset ? 'hidden md:flex w-3 items-end justify-start' : 'flex w-3 items-end justify-start'}>
+                {monthLabels[i] ? (
+                  <span className="font-mono text-[9px] text-ink-muted/50 whitespace-nowrap">
+                    {monthLabels[i]}
+                  </span>
+                ) : null}
+              </div>
+            ))}
+          </div>
+
+          {/* Heatmap — stagger ref on this container, children = week columns */}
+          <div ref={graphRef} className="flex gap-[3px]">
+            {data.weeks.map((week, wi) => (
+              <div key={wi} className={wi < mobileOffset ? 'hidden md:flex flex-col gap-[3px]' : 'flex flex-col gap-[3px]'}>
+                {week.contributionDays.map((day, di) => (
                   <div
+                    key={di}
                     className={`w-3 h-3 rounded-sm transition-colors duration-200 cursor-default ${getColor(day.contributionCount)}`}
+                    onMouseMove={(e) => setTooltip({ text: tooltipLabel(day.contributionCount, day.date), x: e.clientX, y: e.clientY })}
+                    onMouseLeave={() => setTooltip(null)}
                   />
-                  {/* Tooltip */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-bg-card border border-white/[0.08] rounded pointer-events-none whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                    <span className="font-mono text-[9px] text-ink-muted">
-                      {tooltipLabel(day.contributionCount, day.date)}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
