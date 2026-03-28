@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
+import ContributionGraph from '@/components/ContributionGraph'
 
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -26,7 +27,8 @@ export default function About() {
         aria-hidden="true"
       />
 
-      <div className="relative max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+      <div className="relative max-w-7xl mx-auto px-6 w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
         {/* Left — text */}
         <div>
           <p ref={labelRef} className="section-label mb-8">
@@ -147,6 +149,12 @@ export default function About() {
               <span className="absolute top-3 -left-1 w-2 h-2 rounded-full bg-amber animate-pulse" />
             </motion.div>
           </div>
+        </div>
+      </div>
+
+        {/* Contribution graph — full width below two-column layout */}
+        <div className="mt-20 border-t border-white/[0.05] pt-14">
+          <ContributionGraph />
         </div>
       </div>
     </section>

@@ -197,7 +197,7 @@ Phase 3 — Advanced Polish (Month 2)
   [x] Scroll progress bar
   [ ] Sound design toggle
   [ ] Project live preview videos on hover
-  [ ] Cursor trail particles
+  [x] Cursor trail particles
 
 Phase 4 — Viral / Flagship (Month 3+)
   [ ] AI "Ask Martin" chatbot (Claude API)
