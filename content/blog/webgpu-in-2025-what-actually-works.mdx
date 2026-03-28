@@ -1,0 +1,88 @@
+WebGPU shipped in Chrome 113 in May 2023. Two years later, browser support sits at 75% globally — good enough to use with a fallback, not good enough to depend on alone. Here's what I learned building a WebGPU upgrade path into this portfolio's particle system.
+
+## Browser Support Reality
+
+As of early 2025:
+
+- **Chrome 113+** — full support, desktop and Android
+- **Edge 113+** — full support (Chromium-based)
+- **Safari 18+** — partial support, behind a flag on iOS
+- **Firefox** — not yet, in development
+
+The `navigator.gpu` check is the canonical feature detection:
+
+```ts
+export function isWebGPUAvailable(): boolean {
+  if (typeof window === 'undefined') return false
+  return 'gpu' in navigator
+}
+```
+
+Don't check for `WebGPURenderer` — check for the browser API. The renderer is your code; the API is the environment.
+
+## Three.js WebGPU Renderer
+
+Three.js r167 ships a `WebGPURenderer` that internally transpiles GLSL shaders to WGSL via its `GLSLNodeParser`. This is the key insight: **you don't need to rewrite your shaders**. Your existing `ShaderMaterial` GLSL works on WebGPU through Three.js.
+
+```ts
+const { WebGPURenderer } = await import('three/webgpu')
+const renderer = new WebGPURenderer({ canvas, antialias: true, alpha: true })
+await renderer.init() // async — must await before rendering
+```
+
+The `init()` call is async because it requests a GPU adapter and device. This is the main API difference from `WebGLRenderer`.
+
+## The Async Teardown Pattern
+
+The biggest gotcha: if your component unmounts before `renderer.init()` resolves, you'll try to render into a detached canvas. The pattern I use:
+
+```ts
+useEffect(() => {
+  let cancelled = false
+  let teardown: (() => void) | undefined
+
+  const setup = async () => {
+    const renderer = await initRenderer() // may take 100-300ms
+    if (cancelled) { renderer.dispose(); return }
+
+    // ... build scene, start animation loop
+
+    teardown = () => {
+      renderer.dispose()
+      cancelAnimationFrame(rafId)
+    }
+  }
+
+  setup()
+  return () => {
+    cancelled = true
+    teardown?.()
+  }
+}, [])
+```
+
+The `cancelled` flag is checked immediately after the await. If the component unmounted while the GPU was initialising, we dispose immediately and bail. The `teardown` closure captures everything the cleanup needs.
+
+## Particle Count Scaling
+
+WebGPU's main win for particles is throughput. On a device with WebGPU, I scale the count 5×:
+
+```ts
+const count = isWebGPUAvailable()
+  ? Math.min(PARTICLE_COUNT * 5, 9_000)
+  : PARTICLE_COUNT
+```
+
+The `Math.min` cap matters — on integrated GPUs, 9,000 points with per-frame attribute updates can still stutter. Benchmark on real hardware before removing it.
+
+## What Doesn't Work Yet
+
+- **Compute shaders via Three.js**: The `ComputeNode` API exists but is marked experimental. Spring physics in a compute shader would be a meaningful win at 50k+ particles.
+- **`PointsNodeMaterial`**: The TypeScript types in `@types/three` only export `WebGPURenderer` from `three/webgpu` — `PointsNodeMaterial` is missing. Stick with `ShaderMaterial` for now; Three.js transpiles it.
+- **iOS Safari**: The flag is buried in Developer settings. Don't assume your mobile users have it.
+
+## The Verdict
+
+WebGPU is production-ready as an enhancement. The pattern is: detect `navigator.gpu`, try `WebGPURenderer`, catch and fall back to `WebGLRenderer`. Users on supported browsers get more particles and a faster render loop. Everyone else gets the same experience as before.
+
+Don't target WebGPU exclusively until Safari ships it unflagged and Firefox lands support. That's probably 2026.

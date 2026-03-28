@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /plans/
+
+Sitemap: https://martinpetrov.dev/sitemap.xml

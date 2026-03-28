@@ -1,0 +1,40 @@
+I spent most of 2024 building two SaaS products solo: ApexFit (AI fitness coaching) and Local Business OS (multi-tenant CRM + invoicing). Both shipped. Both have paying users. Here's what I'd do differently.
+
+## What I Got Right
+
+**Start with auth and billing on day one.** The temptation is to build features first and "add auth later". Don't. Auth shapes every data model. If you build a feature before auth exists, you'll refactor it when users arrive. I used Clerk for auth (15 minutes to email/Google/GitHub login) and Stripe for billing from the very first commit.
+
+**Postgres over NoSQL for multi-tenant SaaS.** Row-level security in Postgres is the right primitive for multi-tenancy. Every query automatically scopes to the current tenant. I never wrote a `WHERE tenant_id = ?` clause by hand. Supabase makes this approachable without running your own Postgres.
+
+**Separate the data model from the UI early.** I kept all business logic in server functions (`/app/actions.ts`), never in components. Components call actions; actions call the database. This made it trivial to add an API later without rewriting anything.
+
+## What I Got Wrong
+
+**No component library cost me three weeks.** I built 40+ custom UI components from scratch — modals, dropdowns, date pickers, data tables. Each one was "fast to build". Together, they consumed a month of calendar time. I should have started with Radix UI primitives and styled them. Accessibility would have been correct from day one too.
+
+**Over-engineering the real-time layer.** I built WebSocket subscriptions for live dashboard updates. In practice, 95% of users never stayed on the dashboard long enough to see a live update. Polling every 30 seconds with SWR would have been invisible in UX and saved two weeks.
+
+**Skipping error monitoring until production.** I launched without Sentry. The first week of production was flying blind — users reported bugs I couldn't reproduce because I had no stack traces. Add error monitoring before you launch, not after.
+
+## The Stack
+
+```
+Next.js 14 App Router     — framework
+Postgres (Supabase)       — database + RLS
+Clerk                     — auth
+Stripe                    — billing + webhooks
+Resend                    — transactional email
+Vercel                    — hosting
+```
+
+This stack can go from zero to production in a weekend. Every piece has a generous free tier. You don't need to make infrastructure decisions until you have revenue.
+
+## On Going Solo
+
+The hardest part of building solo isn't the code — it's deciding what to build next. Without a team, there's no one to push back on bad ideas or validate good ones. I kept a weekly "product changelog" in Notion where I wrote down what shipped, what didn't, and why. Reading it back a month later was the closest thing to a retrospective I had.
+
+Scope ruthlessly. The features users ask for first are almost never the ones that make them pay. Figure out the one thing that makes the product indispensable and make that excellent before adding anything else.
+
+---
+
+Both products are still running. ApexFit became the foundation for the portfolio's hero screenshot. Local Business OS is in use by three small businesses. Neither is a rocketship — but both taught me more about product engineering than any tutorial could.

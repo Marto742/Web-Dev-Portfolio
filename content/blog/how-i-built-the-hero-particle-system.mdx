@@ -1,0 +1,79 @@
+The hero section of this portfolio runs 1,800 particles in real time using Three.js and custom GLSL shaders. Every particle responds to your cursor, morphs between formations, and fades as you scroll. Here's exactly how it works.
+
+## The Core Idea
+
+Most WebGL particle systems use a simple loop: update positions on the CPU, upload to the GPU each frame. That works for a few hundred particles. For thousands, you want the GPU doing the heavy lifting.
+
+The approach here:
+
+- Store all particle positions in a `Float32Array` attribute on a `BufferGeometry`
+- Write a vertex shader that handles the mouse repulsion and formation offsets
+- Keep the CPU side lightweight — just update two uniforms per frame (`uMouse`, `uTime`)
+
+## The Shader
+
+The vertex shader is where the physics lives. Each particle has a "home" position (its target in the current formation) and a "current" position that gets pushed away from the cursor:
+
+```glsl
+uniform vec2 uMouse;
+uniform float uTime;
+uniform float uRepelRadius;
+
+attribute vec3 aHome;
+
+void main() {
+  vec3 pos = position;
+
+  // Mouse repulsion
+  vec2 toMouse = pos.xy - uMouse;
+  float dist = length(toMouse);
+
+  if (dist < uRepelRadius) {
+    float force = (1.0 - dist / uRepelRadius);
+    pos.xy += normalize(toMouse) * force * 18.0;
+  }
+
+  // Spring back to home
+  pos += (aHome - pos) * 0.08;
+
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+  gl_PointSize = 1.8;
+}
+```
+
+The spring coefficient `0.08` controls how quickly particles snap back. Lower it and they feel floaty; raise it and they feel rigid.
+
+## Formation Morphing
+
+Switching between formations (DNA helix, grid, sphere, wave) works by interpolating `aHome` values. Each formation is a function that takes an index and returns an `[x, y, z]` position:
+
+```ts
+type FormFn = (i: number, rand: () => number, total: number) => [number, number, number]
+
+const DNA: FormFn = (i, rand, total) => {
+  const t = (i / total) * Math.PI * 6
+  const strand = i % 2 === 0 ? 1 : -1
+  return [Math.cos(t) * strand * 2.5, (i / total) * 8 - 4, Math.sin(t) * 1.5]
+}
+```
+
+On formation change, I lerp each particle's `aHome` toward the new position over ~60 frames. The lerp coefficient ramps in and out with a smoothstep curve so the transition doesn't feel mechanical.
+
+## Performance
+
+The main cost is the `setAttribute` call each frame to update positions. With 1,800 particles this is negligible. If you scale to 50,000+ you'd want to move the spring logic into a compute shader (WebGPU) or bake it into a texture and sample it in the vertex shader.
+
+At 1,800 particles, the whole system runs at 60fps on a mid-range mobile GPU with headroom to spare.
+
+## Audio Reactive Mode
+
+The `toggleMic` button pipes microphone input through the Web Audio API's `AnalyserNode`. Each frame, `getByteFrequencyData` fills a `Uint8Array(128)`, I average the values, lerp the result, and feed it into two uniforms:
+
+- `uRepelRadius` scales from 9 to 27 units
+- `uOpacity` scales from 0.75 to 1.0
+
+The lerp smoothing (`0.15` coefficient) prevents the radius from snapping jarringly on transients. Kick drums create a satisfying pulse; sustained notes hold the radius wide.
+
+---
+
+The full source for `HeroWebGL.tsx` is in the portfolio repo. The shader file is embedded in the component as a template literal — no external `.glsl` files needed.
