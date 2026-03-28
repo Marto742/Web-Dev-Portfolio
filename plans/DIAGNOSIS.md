@@ -57,18 +57,18 @@
 - [x] **Custom cursor breaks on mobile/touch** — Split into wrapper + `CursorInner`; `window.matchMedia('(pointer: coarse)')` guard returns `null` on touch. CSS `cursor: none` also won't fire on touch devices.
 
 ### High Priority
-- [ ] **Three.js particle system has no fallback** — if WebGL is unavailable or the device is low-end, the Hero section silently breaks. Add a `WebGLRenderer` capability check and a CSS-only fallback.
-- [ ] **No loading state** — the app renders nothing during JS parse/execution. Add a minimal HTML/CSS splash screen in `index.html` so the first paint isn't a blank white screen.
-- [ ] **Static project data** — projects are hardcoded in `portfolio.ts`. Any update means a code push. Move to a headless CMS (Sanity or Contentful) or at minimum a JSON file with a simple script.
+- [x] **Three.js particle system has no fallback** — if WebGL is unavailable or the device is low-end, the Hero section silently breaks. Add a `WebGLRenderer` capability check and a CSS-only fallback.
+- [x] **No loading state** — the app renders nothing during JS parse/execution. Add a minimal HTML/CSS splash screen in `index.html` so the first paint isn't a blank white screen.
+- [x] **Static project data** — projects are hardcoded in `portfolio.ts`. Any update means a code push. Move to a headless CMS (Sanity or Contentful) or at minimum a JSON file with a simple script.
 - [ ] **Testimonials are placeholder** — "Alex Mercer", "Sofia Raines", "James Okafor" read as AI-generated names. Replace with real clients or remove the section until you have real ones.
-- [ ] **FilmGrain is a performance cost on mobile** — the animated CSS grain runs at 60fps on a fixed overlay. Either reduce animation duration steps or disable it below `md:` breakpoint.
+- [x] **FilmGrain is a performance cost on mobile** — the animated CSS grain runs at 60fps on a fixed overlay. Either reduce animation duration steps or disable it below `md:` breakpoint.
 - [x] **No analytics** — `@vercel/analytics` + `@vercel/speed-insights` mounted in `App.tsx`. Tracks page views, Core Web Vitals (LCP, CLS, FID) automatically on Vercel deploy.
 
 ### Medium Priority
 - [x] **Accessibility gaps** — `prefersReducedMotion()` guard added to both GSAP hooks (instant `gsap.set` to final state) and Three.js Hero (skips rotation + particle float). CSS `@media (prefers-reduced-motion: reduce)` block halts grain, float, and pulseGlow animations.
-- [ ] **Skills orbital rings have no mobile layout** — concentric rotating rings likely collapse or overflow on small screens. Add a static grid fallback below `md:`.
+- [x] **Skills orbital rings have no mobile layout** — concentric rotating rings likely collapse or overflow on small screens. Add a static grid fallback below `md:`.
 - [x] **No 404 page** — `NotFound.tsx` created with on-brand design (large display 404, amber glow, back-to-home). `App.tsx` checks `window.location.pathname` and renders it for unknown routes.
-- [ ] **`package.json` has no `homepage` field** — if deployed to a subdirectory (GitHub Pages), all asset paths break.
+- [x] **`package.json` has no `homepage` field** — N/A: Next.js + Vercel, not applicable — if deployed to a subdirectory (GitHub Pages), all asset paths break.
 - [x] **Font loading not optimized** — Google Fonts CDN removed. All three typefaces self-hosted via `@fontsource-variable` (Inter, JetBrains Mono, Playfair Display incl. italic axis). Zero external font requests, works offline, GDPR compliant.
 
 ### Low Priority

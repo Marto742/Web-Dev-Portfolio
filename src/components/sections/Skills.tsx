@@ -91,11 +91,47 @@ export default function Skills() {
           </h2>
         </div>
 
-        {/* Orbital visualization */}
-        <div ref={orbitsRef} className="flex items-center justify-center">
+        {/* Mobile grid — shown below md: */}
+        <div className="md:hidden grid grid-cols-2 gap-8">
+          <div>
+            <p className="font-mono text-[9px] tracking-widest uppercase text-ink-muted/40 mb-4 flex items-center gap-2">
+              <span className="w-4 h-px bg-white/20 inline-block" />
+              Frontend
+            </p>
+            <div className="flex flex-col gap-2">
+              {frontendSkills.map(skill => (
+                <span
+                  key={skill}
+                  className="font-mono text-[10px] tracking-wider uppercase px-3 py-1.5 border border-white/[0.1] text-ink-muted/60 rounded-sm"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="font-mono text-[9px] tracking-widest uppercase text-ink-muted/40 mb-4 flex items-center gap-2">
+              <span className="w-4 h-px bg-amber/30 inline-block" />
+              Full-Stack
+            </p>
+            <div className="flex flex-col gap-2">
+              {fullStackSkills.map(skill => (
+                <span
+                  key={skill}
+                  className="font-mono text-[10px] tracking-wider uppercase px-3 py-1.5 border border-white/[0.1] text-ink-muted/60 rounded-sm"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Orbital visualization — hidden below md: */}
+        <div ref={orbitsRef} className="hidden md:flex items-center justify-center">
           <div
             className="relative"
-            style={{ width: (outerRadius + 80) * 2, height: (outerRadius + 80) * 2, maxWidth: '100%' }}
+            style={{ width: (outerRadius + 80) * 2, height: (outerRadius + 80) * 2 }}
           >
             {/* Outer ring line */}
             <div
@@ -154,8 +190,8 @@ export default function Skills() {
           </div>
         </div>
 
-        {/* Legend */}
-        <div className="flex justify-center gap-10 mt-8">
+        {/* Legend — desktop only */}
+        <div className="hidden md:flex justify-center gap-10 mt-8">
           <div className="flex items-center gap-2">
             <div className="w-4 h-px bg-white/20" />
             <span className="font-mono text-[9px] tracking-widest uppercase text-ink-muted/40">
