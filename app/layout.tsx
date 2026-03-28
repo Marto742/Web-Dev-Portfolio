@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
+import ThemeProvider from '@/components/ThemeProvider'
 import './globals.css'
 
 const inter = localFont({
@@ -77,13 +78,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       className={`${inter.variable} ${jetbrains.variable} ${playfair.variable}`}
+      suppressHydrationWarning
     >
-      <body>
+      <body suppressHydrationWarning>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
         />
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )

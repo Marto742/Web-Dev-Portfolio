@@ -72,8 +72,8 @@
 - [x] **Font loading not optimized** — Google Fonts CDN removed. All three typefaces self-hosted via `@fontsource-variable` (Inter, JetBrains Mono, Playfair Display incl. italic axis). Zero external font requests, works offline, GDPR compliant.
 
 ### Low Priority
-- [ ] **No dark/light mode toggle** — the design is locked to dark. Even a subtle toggle increases perceived polish.
-- [ ] **`tsconfig.json` has loose settings** — `noUnusedLocals` and `noUnusedParameters` not enforced.
+- [x] **No dark/light mode toggle** — the design is locked to dark. Even a subtle toggle increases perceived polish.
+- [x] **`tsconfig.json` has loose settings** — `noUnusedLocals` and `noUnusedParameters` not enforced.
 - [ ] **No ESLint/Prettier config committed** — code style is inconsistent across files without a `.eslintrc` and `.prettierrc`.
 - [ ] **Vite 5.3.4 is outdated** — current stable is 6.x. Migration is mostly non-breaking.
 

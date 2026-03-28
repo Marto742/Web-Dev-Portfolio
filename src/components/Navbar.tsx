@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { navLinks } from '@/data/portfolio'
+import ThemeToggle from '@/components/ThemeToggle'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -76,15 +77,24 @@ export default function Navbar() {
               Resume
             </a>
           </motion.li>
+          <motion.li
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 2.4 }}
+          >
+            <ThemeToggle />
+          </motion.li>
         </ul>
 
         {/* Mobile menu toggle */}
-        <button
-          className="md:hidden flex flex-col gap-[5px] w-6"
-          onClick={() => setMenuOpen(v => !v)}
-          aria-label="Toggle menu"
-          data-hover
-        >
+        <div className="md:hidden flex items-center gap-4">
+          <ThemeToggle />
+          <button
+            className="flex flex-col gap-[5px] w-6"
+            onClick={() => setMenuOpen(v => !v)}
+            aria-label="Toggle menu"
+            data-hover
+          >
           <motion.span
             className="h-px bg-ink block origin-center"
             animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
@@ -100,7 +110,8 @@ export default function Navbar() {
             animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
             transition={{ duration: 0.3 }}
           />
-        </button>
+          </button>
+        </div>
       </nav>
 
       {/* Mobile menu */}

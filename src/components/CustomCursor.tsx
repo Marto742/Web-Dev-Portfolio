@@ -56,7 +56,7 @@ function CursorInner() {
     <>
       {/* Trail ring */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full border border-amber/40"
+        className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full border border-amber/70"
         style={{
           x: trailX,
           y: trailY,
