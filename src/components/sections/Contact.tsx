@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 import MagneticButton from '@/components/ui/MagneticButton'
 import { sendContact } from '@/actions'
+import { playSuccess, playError } from '@/lib/sound'
 
 interface Particle {
   id: number
@@ -77,10 +78,12 @@ export default function Contact() {
 
       if (result.error) {
         setError(result.error)
+        playError()
         return
       }
 
       spawnParticles()
+      playSuccess()
       setTimeout(() => {
         setSubmitted(true)
         setName('')
@@ -89,6 +92,7 @@ export default function Contact() {
       }, 200)
     } catch {
       setError('Network error. Check your connection and try again.')
+      playError()
     } finally {
       setLoading(false)
     }

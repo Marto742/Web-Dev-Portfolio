@@ -195,7 +195,7 @@ Phase 2 — Ship Real Features (Week 3-4)
 Phase 3 — Advanced Polish (Month 2)
   [x] GitHub contribution graph (live API)
   [x] Scroll progress bar
-  [ ] Sound design toggle
+  [x] Sound design toggle
   [ ] Project live preview videos on hover
   [x] Cursor trail particles
 

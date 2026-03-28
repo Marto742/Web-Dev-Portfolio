@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { navLinks } from '@/data/portfolio'
 import ThemeToggle from '@/components/ThemeToggle'
+import SoundToggle from '@/components/SoundToggle'
+import { playHover } from '@/lib/sound'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -52,6 +54,7 @@ export default function Navbar() {
             <li key={link.href}>
               <motion.button
                 onClick={() => handleNav(link.href)}
+                onMouseEnter={playHover}
                 className="font-mono text-xs tracking-widest uppercase text-ink-muted hover:text-amber transition-colors duration-300 group relative"
                 data-hover
                 initial={{ opacity: 0, y: -10 }}
@@ -71,6 +74,7 @@ export default function Navbar() {
           >
             <a
               href="/resume.pdf"
+              onMouseEnter={playHover}
               className="font-mono text-xs tracking-widest uppercase text-amber border border-amber/40 px-4 py-2 hover:bg-amber/10 hover:border-amber transition-all duration-300"
               data-hover
             >
@@ -82,12 +86,20 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 2.4 }}
           >
+            <SoundToggle />
+          </motion.li>
+          <motion.li
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 2.45 }}
+          >
             <ThemeToggle />
           </motion.li>
         </ul>
 
         {/* Mobile menu toggle */}
         <div className="md:hidden flex items-center gap-4">
+          <SoundToggle />
           <ThemeToggle />
           <button
             className="flex flex-col gap-[5px] w-6"
@@ -129,6 +141,7 @@ export default function Navbar() {
                 <li key={link.href}>
                   <motion.button
                     onClick={() => handleNav(link.href)}
+                    onMouseEnter={playHover}
                     className="font-display text-2xl text-ink hover:text-amber transition-colors w-full text-left"
                     data-hover
                     initial={{ opacity: 0, x: -20 }}

@@ -1,6 +1,8 @@
 'use client'
 
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { startAmbientMode } from '@/lib/sound'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import CustomCursor from '@/components/CustomCursor'
@@ -36,6 +38,8 @@ function Footer() {
 }
 
 export default function ClientShell() {
+  useEffect(() => startAmbientMode(), [])
+
   return (
     <>
       <Analytics />

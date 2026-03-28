@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useStaggerReveal } from '@/hooks/useScrollReveal'
+import { playNote } from '@/lib/sound'
 
 interface ContributionDay {
   contributionCount: number
@@ -108,6 +109,36 @@ function GraphLoaded({ data }: { data: ContributionCalendar }) {
   const monthLabels = getMonthLabels(data.weeks)
   const mobileOffset = Math.max(0, data.weeks.length - 26)
 
+  // Musical fingerprint — play a note per visible column as the graph animates in
+  useEffect(() => {
+    const container = graphRef.current
+    if (!container) return
+
+    let played = false
+    const timeouts: ReturnType<typeof setTimeout>[] = []
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !played) {
+          played = true
+          data.weeks.forEach((week, wi) => {
+            if (wi < mobileOffset) return // skip columns hidden on mobile
+            const weekTotal = week.contributionDays.reduce((s, d) => s + d.contributionCount, 0)
+            const delay = (wi - mobileOffset) * 12 // 12 ms matches the 0.012s GSAP stagger
+            timeouts.push(setTimeout(() => playNote(weekTotal), delay))
+          })
+        }
+      },
+      { threshold: 0.1 },
+    )
+
+    observer.observe(container)
+    return () => {
+      observer.disconnect()
+      timeouts.forEach(clearTimeout)
+    }
+  }, [data.weeks, mobileOffset])
+
   return (
     <div>
       {/* Fixed tooltip — escapes overflow container, follows cursor */}
@@ -143,6 +174,7 @@ function GraphLoaded({ data }: { data: ContributionCalendar }) {
                   <div
                     key={di}
                     className={`w-3 h-3 rounded-sm transition-colors duration-200 cursor-default ${getColor(day.contributionCount)}`}
+                    onMouseEnter={() => playNote(day.contributionCount)}
                     onMouseMove={(e) => setTooltip({ text: tooltipLabel(day.contributionCount, day.date), x: e.clientX, y: e.clientY })}
                     onMouseLeave={() => setTooltip(null)}
                   />
