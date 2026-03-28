@@ -1,12 +1,28 @@
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 import ContributionGraph from '@/components/ContributionGraph'
 
+interface GitHubStats {
+  repos: number
+  followers: number
+  contributions: number
+}
+
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null)
+  const [ghStats, setGhStats] = useState<GitHubStats | null>(null)
+
+  useEffect(() => {
+    fetch('/api/github')
+      .then(r => r.ok ? r.json() : null)
+      .then((d: { repos: number; followers: number; calendar: { totalContributions: number } } | null) => {
+        if (d) setGhStats({ repos: d.repos, followers: d.followers, contributions: d.calendar.totalContributions })
+      })
+      .catch(() => null)
+  }, [])
   const labelRef = useScrollReveal<HTMLParagraphElement>({ y: 30, delay: 0 })
   const textRef = useScrollReveal<HTMLDivElement>({ y: 60, duration: 1.1 })
   const imageRef = useScrollReveal<HTMLDivElement>({ x: 60, y: 0, duration: 1.1, delay: 0.15 })
@@ -64,9 +80,18 @@ export default function About() {
             {/* Stats */}
             <div className="mt-12 grid grid-cols-3 gap-8">
               {[
-                { value: '15+', label: 'Projects shipped' },
-                { value: '2+', label: 'Years building' },
-                { value: '∞', label: 'Coffee consumed' },
+                {
+                  value: ghStats ? `${ghStats.repos}` : '—',
+                  label: 'Public repos',
+                },
+                {
+                  value: ghStats ? `${ghStats.contributions}` : '—',
+                  label: 'Contributions',
+                },
+                {
+                  value: ghStats ? `${ghStats.followers}` : '—',
+                  label: 'Followers',
+                },
               ].map(stat => (
                 <div key={stat.label} className="border-t border-white/[0.08] pt-5">
                   <p className="font-display text-3xl font-bold text-amber leading-none mb-1">

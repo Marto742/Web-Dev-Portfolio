@@ -14,9 +14,21 @@ export interface ContributionCalendar {
   weeks: ContributionWeek[]
 }
 
+export interface GitHubData {
+  calendar: ContributionCalendar
+  repos: number
+  followers: number
+}
+
 const QUERY = `
   query($username: String!) {
     user(login: $username) {
+      repositories(privacy: PUBLIC, ownerAffiliations: [OWNER]) {
+        totalCount
+      }
+      followers {
+        totalCount
+      }
       contributionsCollection {
         contributionCalendar {
           totalContributions
@@ -62,7 +74,13 @@ export async function GET() {
     }
 
     const json = (await res.json()) as {
-      data?: { user?: { contributionsCollection?: { contributionCalendar?: ContributionCalendar } } }
+      data?: {
+        user?: {
+          repositories?: { totalCount: number }
+          followers?: { totalCount: number }
+          contributionsCollection?: { contributionCalendar?: ContributionCalendar }
+        }
+      }
       errors?: Array<{ message: string }>
     }
 
@@ -70,13 +88,20 @@ export async function GET() {
       return NextResponse.json({ error: json.errors[0].message }, { status: 400 })
     }
 
-    const calendar = json.data?.user?.contributionsCollection?.contributionCalendar
+    const user = json.data?.user
+    const calendar = user?.contributionsCollection?.contributionCalendar
 
-    if (!calendar) {
+    if (!calendar || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    return NextResponse.json(calendar)
+    const data: GitHubData = {
+      calendar,
+      repos: user.repositories?.totalCount ?? 0,
+      followers: user.followers?.totalCount ?? 0,
+    }
+
+    return NextResponse.json(data)
   } catch {
     return NextResponse.json({ error: 'Failed to fetch GitHub data' }, { status: 500 })
   }

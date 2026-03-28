@@ -151,7 +151,7 @@ Immediate (this session)
 Advanced (future)
   [x] Hover tooltips per cell (date + count)
   [x] Streak counter badge
-  [ ] Live stats (totalContributions, repos, followers) replacing hardcoded numbers
+  [x] Live stats (totalContributions, repos, followers) replacing hardcoded numbers
   [ ] Responsive: 26 weeks on mobile
 
 Viral (Phase 4)

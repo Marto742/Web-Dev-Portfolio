@@ -147,6 +147,12 @@ function GraphLoaded({ data }: { data: ContributionCalendar }) {
   )
 }
 
+interface GitHubData {
+  calendar: ContributionCalendar
+  repos: number
+  followers: number
+}
+
 export default function ContributionGraph() {
   const [data, setData] = useState<ContributionCalendar | null>(null)
   const [failed, setFailed] = useState(false)
@@ -155,9 +161,9 @@ export default function ContributionGraph() {
     fetch('/api/github')
       .then(r => {
         if (!r.ok) throw new Error('fetch failed')
-        return r.json() as Promise<ContributionCalendar>
+        return r.json() as Promise<GitHubData>
       })
-      .then(setData)
+      .then(d => setData(d.calendar))
       .catch(() => setFailed(true))
   }, [])
 
